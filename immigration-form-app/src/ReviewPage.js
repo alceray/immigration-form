@@ -1,13 +1,21 @@
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import InputMask from "react-input-mask";
 import { useNavigate } from "react-router-dom";
 
-export default function ImmigrationForm() {
+export default function ReviewPage() {
+  const [data, setData] = useState(null);
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
-  const onSubmit = (data) => {
-    fetch("http://localhost:8080/api/immigrationForm/submitForm", {
-      method: "POST",
+  useEffect(() => {
+    fetch("http://localhost:8080/api/immigrationForm/latest")
+      .then((response) => response.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
+  const handleUpdate = (data) => {
+    fetch("http://localhost:8080/api/immigrationForm/updateForm", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -16,24 +24,24 @@ export default function ImmigrationForm() {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success: ", data);
-        navigate("/review");
+        navigate("/");
       })
       .catch((error) => {
         console.error("Error: ", error);
       });
   };
+  if (!data) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(handleUpdate)}
         className="bg-white p-8 rounded shadow-xl my-20 w-2/3 grid grid-cols-2 gap-4"
       >
-        <h1 className="text-3xl font-bold col-span-2">Form I-129</h1>
+        <h1 className="text-3xl font-bold col-span-2">Review Form</h1>
         <h3 className="text-xl my-2 col-span-2">
-          <b>Part 3. Beneficiary Information</b> (Information about the
-          beneficary/beneficiaries you are filing for. Complete the blocks
-          below. Use the Attachment-1 sheet to name each beneficiary included in
-          this petition.) (continued)
+          <b>Part 3. Beneficiary Information</b>
         </h3>
         <label className="block">
           Alien Registration Number (A-Number)
@@ -51,6 +59,7 @@ export default function ImmigrationForm() {
           Country of Birth
           <input
             type="text"
+            defaultValue={data.countryOfBirth}
             {...register("countryOfBirth", {
               required: "This field is required",
             })}
@@ -61,6 +70,7 @@ export default function ImmigrationForm() {
           Province of Birth
           <input
             type="text"
+            defaultValue={data.provinceOfBirth}
             {...register("provinceOfBirth", {
               required: "This field is required",
             })}
@@ -71,6 +81,7 @@ export default function ImmigrationForm() {
           Country of Citizenship or Nationality
           <input
             type="text"
+            defaultValue={data.countryOfCitizenship}
             {...register("countryOfCitizenship", {
               required: "This field is required",
             })}
@@ -85,6 +96,7 @@ export default function ImmigrationForm() {
             Date of Last Arrival (mm/dd/yyyy)
             <input
               type="text"
+              defaultValue={data.dateOfLastArrival}
               {...register("dateOfLastArrival")}
               className="w-full p-2 border rounded"
             />
@@ -108,6 +120,7 @@ export default function ImmigrationForm() {
           Passport or Travel Document Number
           <input
             type="text"
+            defaultValue={data.passportNumber}
             {...register("passportNumber")}
             className="w-full p-2 border rounded"
           />
@@ -117,6 +130,7 @@ export default function ImmigrationForm() {
             Date Passport or Travel Document Issued (mm/dd/yyyy)
             <input
               type="text"
+              defaultValue={data.datePassportIssued}
               {...register("datePassportIssued")}
               className="w-full p-2 border rounded"
             />
@@ -125,6 +139,7 @@ export default function ImmigrationForm() {
             Date Passport or Travel Document Expires (mm/dd/yyyy)
             <input
               type="text"
+              defaultValue={data.datePassportExpires}
               {...register("datePassportExpires")}
               className="w-full p-2 border rounded"
             />
@@ -134,6 +149,7 @@ export default function ImmigrationForm() {
           Passport of Travel Document Country of Issuance
           <input
             type="text"
+            defaultValue={data.passportCountryOfIssuance}
             {...register("passportCountryOfIssuance")}
             className="w-full p-2 border rounded"
           />
@@ -142,6 +158,7 @@ export default function ImmigrationForm() {
           Current Nonimmigrant Status
           <input
             type="text"
+            defaultValue={data.currentNonimmigrantStatus}
             {...register("currentNonimmigrantStatus")}
             className="w-full p-2 border rounded"
           />
@@ -150,6 +167,7 @@ export default function ImmigrationForm() {
           Date Status Expires or D/S (mm/dd/yyyy)
           <input
             type="text"
+            defaultValue={data.dateStatusExpires}
             {...register("dateStatusExpires")}
             className="w-full p-2 border rounded"
           />
@@ -159,6 +177,7 @@ export default function ImmigrationForm() {
           any)
           <input
             type="text"
+            defaultValue={data.sevisNumber}
             {...register("sevisNumber")}
             className="w-full p-2 border rounded"
           />
@@ -167,18 +186,19 @@ export default function ImmigrationForm() {
           Employment Authorization Document (EAD) Number (if any)
           <input
             type="text"
+            defaultValue={data.eadNumber}
             {...register("eadNumber")}
             className="w-full p-2 border rounded"
           />
         </label>
         <p className="mt-2 col-span-2">
-          <b>6. Current Residential U.S. Address</b> (if applicable) (do not
-          list a P.O. Box)
+          <b>6. Current Residential U.S. Address</b>
         </p>
         <label className="block">
           Street Number and Name
           <input
             type="text"
+            defaultValue={data.streetNumberAndName}
             {...register("streetNumberAndName")}
             className="w-full p-2 border rounded"
           />
@@ -187,21 +207,34 @@ export default function ImmigrationForm() {
           <div className="flex space-x-4">
             <label className="flex flex-col items-center mt-4">
               Apt.
-              <input type="checkbox" {...register("apt")} />
+              <input
+                type="checkbox"
+                defaultChecked={data.apt}
+                {...register("apt")}
+              />
             </label>
             <label className="flex flex-col items-center mt-4">
               Ste.
-              <input type="checkbox" {...register("ste")} />
+              <input
+                type="checkbox"
+                defaultChecked={data.ste}
+                {...register("ste")}
+              />
             </label>
             <label className="flex flex-col items-center mt-4">
               Flr.
-              <input type="checkbox" {...register("flr")} />
+              <input
+                type="checkbox"
+                defaultChecked={data.flr}
+                {...register("flr")}
+              />
             </label>
           </div>
           <label className="block flex-grow">
             Number
             <input
               type="text"
+              defaultValue={data.number}
               {...register("number")}
               className="w-full p-2 border rounded"
             />
@@ -211,6 +244,7 @@ export default function ImmigrationForm() {
           City or Town
           <input
             type="text"
+            defaultValue={data.city}
             {...register("city")}
             className="w-full p-2 border rounded"
           />
@@ -220,6 +254,7 @@ export default function ImmigrationForm() {
             State
             <input
               type="text"
+              defaultValue={data.state}
               {...register("state")}
               className="w-full p-2 border rounded"
             />
@@ -228,6 +263,7 @@ export default function ImmigrationForm() {
             ZIP Code
             <input
               type="text"
+              defaultValue={data.zipCode}
               {...register("zipCode")}
               className="w-full p-2 border rounded"
             />
@@ -236,15 +272,10 @@ export default function ImmigrationForm() {
         <h3 className="text-xl font-bold mt-4 b-2 col-span-2">
           Part 4. Processing Information
         </h3>
-        <p className="mt-2 col-span-2">
-          <b>1.</b> If a beneficiary or beneficiaries named in <b>Part 3.</b>{" "}
-          is/are outside the United States, or a requested extension of stay or
-          change of status cannot be granted, state the U.S. Consolute or
-          inspection facility you want notified if this petition is approved.
-        </p>
         <label className="block">
           <b>a. Type of Office</b>
           <select
+            defaultValue={data.typeOfOffice}
             {...register("typeOfOffice")}
             className="w-full p-2 border rounded"
           >
@@ -258,6 +289,7 @@ export default function ImmigrationForm() {
           <b>b. Office Address (City)</b>
           <input
             type="text"
+            defaultValue={data.officeAddress}
             {...register("officeAddress")}
             className="w-full p-2 border rounded"
           />
@@ -266,6 +298,7 @@ export default function ImmigrationForm() {
           <b>c. U.S. State or Foreign Country</b>
           <input
             type="text"
+            defaultValue={data.usStateOrForeignCountry}
             {...register("usStateOrForeignCountry")}
             className="w-full p-2 border rounded"
           />
@@ -276,6 +309,7 @@ export default function ImmigrationForm() {
           Street Number and Name
           <input
             type="text"
+            defaultValue={data.foreignStreetNumberAndName}
             {...register("foreignStreetNumberAndName")}
             className="w-full p-2 border rounded"
           />
@@ -284,21 +318,34 @@ export default function ImmigrationForm() {
           <div className="flex space-x-4">
             <label className="flex flex-col items-center mt-4">
               Apt.
-              <input type="checkbox" {...register("foreignApt")} />
+              <input
+                type="checkbox"
+                defaultChecked={data.foreignApt}
+                {...register("foreignApt")}
+              />
             </label>
             <label className="flex flex-col items-center mt-4">
               Ste.
-              <input type="checkbox" {...register("foreignSte")} />
+              <input
+                type="checkbox"
+                defaultChecked={data.foreignSte}
+                {...register("foreignSte")}
+              />
             </label>
             <label className="flex flex-col items-center mt-4">
               Flr.
-              <input type="checkbox" {...register("foreignFlr")} />
+              <input
+                type="checkbox"
+                defaultChecked={data.foreignFlr}
+                {...register("foreignFlr")}
+              />
             </label>
           </div>
           <label className="block flex-grow">
             Number
             <input
               type="text"
+              defaultValue={data.foreignNumber}
               {...register("foreignNumber")}
               className="w-full p-2 border rounded"
             />
@@ -308,6 +355,7 @@ export default function ImmigrationForm() {
           City or Town
           <input
             type="text"
+            defaultValue={data.foreignCity}
             {...register("foreignCity")}
             className="w-full p-2 border rounded"
           />
@@ -316,6 +364,7 @@ export default function ImmigrationForm() {
           State
           <input
             type="text"
+            defaultValue={data.foreignState}
             {...register("foreignState")}
             className="w-full p-2 border rounded"
           />
@@ -326,6 +375,7 @@ export default function ImmigrationForm() {
             Province
             <input
               type="text"
+              defaultValue={data.foreignProvince}
               {...register("foreignProvince")}
               className="w-full p-2 border rounded"
             />
@@ -334,6 +384,7 @@ export default function ImmigrationForm() {
             Postal Code
             <input
               type="text"
+              defaultValue={data.foreignPostalCode}
               {...register("foreignPostalCode")}
               className="w-full p-2 border rounded"
             />
@@ -343,14 +394,15 @@ export default function ImmigrationForm() {
           Country
           <input
             type="text"
+            defaultValue={data.foreignCountry}
             {...register("foreignCountry")}
             className="w-full p-2 border rounded"
           />
         </label>
         <label className="block">
-          <b>2.</b> Does each person in this petition have a valid passport? (if
-          no, go to <b>Part 9.</b> and type or print your explanation)
+          <b>2.</b> Does each person in this petition have a valid passport?
           <select
+            defaultValue={data.validPassport}
             {...register("validPassport")}
             className="w-full p-2 border rounded"
           >
@@ -364,7 +416,7 @@ export default function ImmigrationForm() {
           type="submit"
           className="bg-blue-500 text-xl text-white mt-5 py-2 px-4 rounded hover:bg-blue-600 col-span-2"
         >
-          Submit
+          Update
         </button>
       </form>
     </div>
