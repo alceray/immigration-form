@@ -4,7 +4,20 @@ import InputMask from "react-input-mask";
 export default function ImmigrationForm() {
   const { register, handleSubmit } = useForm();
   const onSubmit = (data) => {
-    console.log(data);
+    fetch("http://localhost:8080/api/immigrationForm/submitForm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success: ", data);
+      })
+      .catch((error) => {
+        console.error("Error: ", error);
+      });
   };
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -260,7 +273,7 @@ export default function ImmigrationForm() {
           Street Number and Name
           <input
             type="text"
-            {...register("beneficiaryStreetNumberAndName")}
+            {...register("foreignStreetNumberAndName")}
             className="w-full p-2 border rounded"
           />
         </label>
@@ -268,22 +281,22 @@ export default function ImmigrationForm() {
           <div className="flex space-x-4">
             <label className="flex flex-col items-center mt-4">
               Apt.
-              <input type="checkbox" {...register("beneficiaryApt")} />
+              <input type="checkbox" {...register("foreignApt")} />
             </label>
             <label className="flex flex-col items-center mt-4">
               Ste.
-              <input type="checkbox" {...register("beneficiarySte")} />
+              <input type="checkbox" {...register("foreignSte")} />
             </label>
             <label className="flex flex-col items-center mt-4">
               Flr.
-              <input type="checkbox" {...register("beneficiaryFlr")} />
+              <input type="checkbox" {...register("foreignFlr")} />
             </label>
           </div>
           <label className="block flex-grow">
             Number
             <input
               type="text"
-              {...register("beneficiaryNumber")}
+              {...register("foreignNumber")}
               className="w-full p-2 border rounded"
             />
           </label>
@@ -292,7 +305,7 @@ export default function ImmigrationForm() {
           City or Town
           <input
             type="text"
-            {...register("beneficiaryCity")}
+            {...register("foreignCity")}
             className="w-full p-2 border rounded"
           />
         </label>
@@ -300,7 +313,7 @@ export default function ImmigrationForm() {
           State
           <input
             type="text"
-            {...register("beneficiaryState")}
+            {...register("foreignState")}
             className="w-full p-2 border rounded"
           />
         </label>
@@ -310,7 +323,7 @@ export default function ImmigrationForm() {
             Province
             <input
               type="text"
-              {...register("beneficiaryProvince")}
+              {...register("foreignProvince")}
               className="w-full p-2 border rounded"
             />
           </label>
@@ -318,7 +331,7 @@ export default function ImmigrationForm() {
             Postal Code
             <input
               type="text"
-              {...register("beneficiaryPostalCode")}
+              {...register("foreignPostalCode")}
               className="w-full p-2 border rounded"
             />
           </label>
@@ -327,7 +340,7 @@ export default function ImmigrationForm() {
           Country
           <input
             type="text"
-            {...register("beneficiaryCountry")}
+            {...register("foreignCountry")}
             className="w-full p-2 border rounded"
           />
         </label>
