@@ -6,7 +6,7 @@ An intake form that requests all elements of Form I-129, page 3, which is a real
 * React
 * Spring Boot
 * Postgres
-### Setup
+### Local Setup
 1. Create a Postgres database named immigration-form
 2. Configure the environment variables POSTGRES_USERNAME and POSTGRES_PASSWORD
 3. Navigate into immigration-form-backend and run gradle bootRun
