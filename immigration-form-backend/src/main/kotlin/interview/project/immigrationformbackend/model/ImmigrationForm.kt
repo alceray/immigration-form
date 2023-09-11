@@ -1,5 +1,6 @@
 package interview.project.immigrationformbackend.model
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -13,9 +14,13 @@ data class ImmigrationForm(
     val countryOfBirth: String,
     val countryOfCitizenship: String,
     val currentNonimmigrantStatus: String,
+    @JsonFormat(pattern="M/d/yyyy")
     val dateOfLastArrival: LocalDate,
+    @JsonFormat(pattern="M/d/yyyy")
     val datePassportExpires: LocalDate,
+    @JsonFormat(pattern="M/d/yyyy")
     val datePassportIssued: LocalDate,
+    @JsonFormat(pattern="M/d/yyyy")
     val dateStatusExpires: LocalDate,
     val eadNumber: Long,
     val flr: Boolean,
@@ -24,7 +29,7 @@ data class ImmigrationForm(
     val foreignCountry: String,
     val foreignFlr: Boolean,
     val foreignNumber: Long,
-    val foreignPostCode: String,
+    val foreignPostalCode: String,
     val foreignProvince: String,
     val foreignState: String,
     val foreignSte: Boolean,
